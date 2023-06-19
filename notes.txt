@@ -1,0 +1,1 @@
+start": "nodemon functions/api.js"
