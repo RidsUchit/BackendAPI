@@ -1,11 +1,5 @@
 const { response } = require("express");
-var config = require("../db/dbconfig");
-const sql = require("mssql");
-
-sql
-  .connect(config)
-  .then(() => console.log("Connected to MSSQL database"))
-  .catch((err) => console.error("Error connecting to MSSQL database", err));
+const { poolPromise, sql } = require("../db/dbconfig");
 
 // async function getPosts(userId,offset) {
 //     try {
@@ -32,12 +26,12 @@ sql
 //         //cleanupResources();
 //     }
 // }
-async function getPosts(userId) {
+async function getPosts(userId, offset) {
   try {
-    let pool = await sql.connect(config);
-    let result = await pool
+    const pool = await poolPromise;
+    const result = await pool
       .request()
-      .input("start", sql.Int, 1)
+      .input("start", sql.Int, offset)
       .input("length", sql.Int, 10)
       .input("userId", sql.BigInt, userId)
       .input("isOwner", sql.Int, 0)
@@ -53,6 +47,7 @@ async function getPosts(userId) {
     //cleanupResources();
   }
 }
+
 async function getPostDetail(postId) {
   /* try {
         let pool = await sql.connect(config);
